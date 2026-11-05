@@ -1,0 +1,2655 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="icon" type="image/png" href="icon.png">
+  <!-- SEO & Social Meta Tags -->
+  <title>CodePush — Solved Problems to GitHub | Chrome Extension</title>
+  <meta name="description" content="CodePush is a next-generation Manifest V3 Chrome extension that auto-detects solved coding problems on GeeksforGeeks, HackerRank, and CodeChef and pushes your code directly to GitHub in one click.">
+  <meta name="keywords" content="Chrome Extension, GitHub, GeeksforGeeks, HackerRank, CodeChef, competitive programming, coding solutions, automated commit, Manifest V3">
+  <meta name="author" content="Rajendra Kandiboyina">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://github.com/rajendra-18git">
+  <meta property="og:title" content="CodePush — Solved Problems to GitHub">
+  <meta property="og:description" content="Push your solved problems on GeeksforGeeks, HackerRank, and CodeChef directly to GitHub in one click. 100% private, local storage only.">
+  <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630' width='1200' height='630'><rect width='1200' height='630' fill='%23080A0F'/><text x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='68' font-weight='900' fill='%23E2FD52'>✦ CODEPUSH</text><text x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='32' fill='%23FFFFFF'>Solved Problems to GitHub in One Click</text></svg>">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CodePush — Solved Problems to GitHub">
+  <meta name="twitter:description" content="Auto-detect and commit your solutions from GeeksforGeeks, HackerRank, and CodeChef to GitHub automatically.">
+
+  <!-- Google Fonts: Space Grotesk, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       Design System — Wingly / Halo Lab Aesthetic
+       High-contrast obsidian, electric neon-lime (#E2FD52), cyan glow & frosted glass
+       ========================================================================== */
+    :root {
+      /* Dark Theme (Wingly Signature) */
+      --bg-base: #080a0f;
+      --bg-surface: #0f131c;
+      --bg-surface-elevated: #161c28;
+      --bg-surface-hover: #1e2636;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(226, 253, 82, 0.45);
+      --border-subtle: rgba(255, 255, 255, 0.04);
+      --text-main: #ffffff;
+      --text-muted: #8e9bb0;
+      --text-dim: #546074;
+      
+      /* Neon Accent Accents */
+      --accent-neon: #e2fd52;         /* Wingly Electric Lime-Yellow */
+      --accent-neon-hover: #d2f038;
+      --accent-neon-subtle: rgba(226, 253, 82, 0.12);
+      --accent-neon-glow: rgba(226, 253, 82, 0.28);
+      
+      --accent-cyan: #00f0ff;         /* Balancing Sky Cyan */
+      --accent-cyan-subtle: rgba(0, 240, 255, 0.12);
+      --accent-cyan-glow: rgba(0, 240, 255, 0.25);
+      
+      --accent-purple: #a855f7;
+      --accent-purple-subtle: rgba(168, 85, 247, 0.12);
+      --accent-orange: #ff8a3d;
+      --accent-red: #ff4757;
+      
+      --card-glass: rgba(15, 19, 28, 0.72);
+      --card-glass-hover: rgba(22, 28, 40, 0.88);
+      --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.65), 0 0 1px 1px rgba(255, 255, 255, 0.05);
+      --nav-glass: rgba(8, 10, 15, 0.8);
+      --code-bg: #090c12;
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --radius-pill: 9999px;
+      
+      --transition-smooth: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      --font-display: 'Space Grotesk', -apple-system, sans-serif;
+      --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f7f9fc;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #eef2f7;
+      --bg-surface-hover: #e5ebf2;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-focus: #0f131c;
+      --border-subtle: rgba(0, 0, 0, 0.04);
+      --text-main: #0a0d14;
+      --text-muted: #576275;
+      --text-dim: #9aa5b5;
+      
+      --accent-neon: #0f131c;         /* High-contrast luxury black in light mode */
+      --accent-neon-hover: #262e3d;
+      --accent-neon-subtle: rgba(15, 19, 28, 0.06);
+      --accent-neon-glow: rgba(15, 19, 28, 0.12);
+      
+      --accent-cyan: #0284c7;
+      --accent-cyan-subtle: rgba(2, 132, 199, 0.1);
+      --accent-cyan-glow: rgba(2, 132, 199, 0.2);
+      
+      --card-glass: rgba(255, 255, 255, 0.85);
+      --card-glass-hover: #ffffff;
+      --card-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.08), 0 0 1px 1px rgba(0, 0, 0, 0.04);
+      --nav-glass: rgba(247, 249, 252, 0.85);
+      --code-bg: #eef2f7;
+    }
+
+    /* Reset & Global */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color var(--transition-smooth), color var(--transition-smooth);
+      position: relative;
+    }
+
+    /* Monospace */
+    code, pre, kbd, .mono {
+      font-family: var(--font-mono);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: color var(--transition-smooth);
+    }
+
+    /* Ambient Background Glow (Wingly radial gradient mesh) */
+    .bg-mesh-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .mesh-blob-1 {
+      position: absolute;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 750px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(226, 253, 82, 0.12) 0%, rgba(0, 240, 255, 0.05) 50%, transparent 70%);
+      filter: blur(80px);
+    }
+    .mesh-blob-2 {
+      position: absolute;
+      top: 35%;
+      right: -100px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 65%);
+      filter: blur(90px);
+    }
+    .mesh-blob-3 {
+      position: absolute;
+      bottom: 10%;
+      left: -100px;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, transparent 70%);
+      filter: blur(100px);
+    }
+
+    /* Container Utility */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.75rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section {
+      padding: 6.5rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 768px) {
+      .section {
+        padding: 4rem 0;
+      }
+    }
+
+    /* Typography & Headers */
+    .section-header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 4rem;
+    }
+
+    /* Wingly Sparkle Capsule Tag */
+    .sparkle-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-neon);
+      background: var(--accent-neon-subtle);
+      border: 1px solid rgba(226, 253, 82, 0.3);
+      padding: 0.35rem 0.95rem;
+      border-radius: var(--radius-pill);
+      margin-bottom: 1.25rem;
+      backdrop-filter: blur(8px);
+    }
+    [data-theme="light"] .sparkle-tag {
+      color: #0f131c;
+      border-color: rgba(15, 19, 28, 0.2);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.75rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+    }
+
+    @media (max-width: 768px) {
+      .section-title {
+        font-size: 2.1rem;
+      }
+    }
+
+    .section-description {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* Buttons — Wingly Pill Style */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 0.75rem 1.6rem;
+      border-radius: var(--radius-pill);
+      transition: all var(--transition-smooth);
+      cursor: pointer;
+      border: 1px solid transparent;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    /* Primary Neon-Lime Action Button */
+    .btn-neon {
+      background-color: var(--accent-neon);
+      color: #080a0f;
+      box-shadow: 0 4px 20px var(--accent-neon-glow);
+    }
+    .btn-neon:hover {
+      background-color: var(--accent-neon-hover);
+      box-shadow: 0 6px 28px rgba(226, 253, 82, 0.45);
+      transform: translateY(-2px);
+    }
+    [data-theme="light"] .btn-neon {
+      color: #ffffff;
+    }
+
+    /* Secondary Glass Action Button */
+    .btn-glass {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border-color: var(--border-color);
+      backdrop-filter: blur(12px);
+    }
+    .btn-glass:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    [data-theme="light"] .btn-glass {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .btn-sm {
+      font-size: 0.825rem;
+      padding: 0.45rem 1rem;
+    }
+
+    .btn-arrow-circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.18);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 0.25rem;
+      transition: transform var(--transition-smooth);
+    }
+    .btn:hover .btn-arrow-circle {
+      transform: translateX(3px);
+    }
+
+    /* ==========================================================================
+       1. Floating Pill Navbar
+       ========================================================================== */
+    .site-header {
+      position: sticky;
+      top: 1.25rem;
+      z-index: 1000;
+      margin-bottom: -1.25rem;
+    }
+
+    .navbar-pill {
+      background: var(--nav-glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-pill);
+      padding: 0.55rem 0.85rem 0.55rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transition: all var(--transition-smooth);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+    
+    .brand-wing-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-neon) 0%, #00f0ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #080a0f;
+      box-shadow: 0 0 14px var(--accent-neon-glow);
+    }
+
+    .brand-version-badge {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      background: var(--accent-neon-subtle);
+      border: 1px solid rgba(226, 253, 82, 0.25);
+      border-radius: var(--radius-pill);
+      color: var(--accent-neon);
+    }
+    [data-theme="light"] .brand-version-badge {
+      color: #0f131c;
+      border-color: rgba(15, 19, 28, 0.15);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+    }
+
+    .nav-link {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: color var(--transition-smooth);
+    }
+    .nav-link:hover {
+      color: var(--text-main);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .theme-toggle-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-smooth);
+    }
+    .theme-toggle-btn:hover {
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: scale(1.05);
+    }
+
+    .hamburger-btn {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 5.5rem;
+      left: 1.5rem;
+      right: 1.5rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      z-index: 999;
+      flex-direction: column;
+      gap: 1.25rem;
+      box-shadow: var(--card-shadow);
+    }
+    .mobile-menu.open {
+      display: flex;
+    }
+
+    @media (max-width: 890px) {
+      .nav-links {
+        display: none;
+      }
+      .hamburger-btn {
+        display: flex;
+      }
+      .navbar-pill .desktop-download {
+        display: none;
+      }
+    }
+
+    /* ==========================================================================
+       2. Hero Section — Wingly High-Impact Typography & Floating UI
+       ========================================================================== */
+    .hero-section {
+      padding: 8rem 0 5rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-sparkle-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      background: var(--card-glass);
+      border: 1px solid rgba(226, 253, 82, 0.35);
+      padding: 0.4rem 1.2rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.825rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2rem;
+      box-shadow: 0 0 20px rgba(226, 253, 82, 0.15);
+    }
+    .hero-sparkle-pill .dot-live {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-neon);
+      box-shadow: 0 0 10px var(--accent-neon);
+      animation: pulseDot 2s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: 4.25rem;
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+      max-width: 950px;
+      margin: 0 auto 1.5rem;
+      color: var(--text-main);
+    }
+
+    @media (max-width: 992px) {
+      .hero-headline {
+        font-size: 3.25rem;
+      }
+    }
+    @media (max-width: 600px) {
+      .hero-headline {
+        font-size: 2.4rem;
+      }
+    }
+
+    .hero-headline .text-gradient {
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent-neon) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    [data-theme="light"] .hero-headline .text-gradient {
+      background: linear-gradient(135deg, #0a0d14 30%, #0284c7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      margin-bottom: 3.5rem;
+    }
+
+    /* Hero Mockup Wrapper with Overlapping Floating Pill Cards */
+    .hero-visual-container {
+      position: relative;
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    /* Floating Pill Badges around Mockup */
+    .floating-card-left {
+      position: absolute;
+      top: 18%;
+      left: -28px;
+      background: var(--card-glass);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-pill);
+      padding: 0.65rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+      z-index: 10;
+      animation: floatGentle 5s ease-in-out infinite;
+    }
+
+    .floating-card-right {
+      position: absolute;
+      bottom: 22%;
+      right: -28px;
+      background: var(--card-glass);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(226, 253, 82, 0.35);
+      border-radius: var(--radius-pill);
+      padding: 0.65rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-neon-glow);
+      z-index: 10;
+      animation: floatGentle 6s ease-in-out infinite reverse;
+    }
+
+    @keyframes floatGentle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @media (max-width: 900px) {
+      .floating-card-left, .floating-card-right {
+        display: none;
+      }
+    }
+
+    /* High-End Browser Window Mockup */
+    .browser-glass-mock {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--card-shadow), 0 0 60px rgba(0, 0, 0, 0.5);
+      position: relative;
+      text-align: left;
+    }
+
+    .browser-top-bar {
+      background: var(--bg-surface-elevated);
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .browser-dots {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .browser-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .b-dot-1 { background: #ff5f56; }
+    .b-dot-2 { background: #ffbd2e; }
+    .b-dot-3 { background: #27c93f; }
+
+    .browser-pill-search {
+      flex: 1;
+      max-width: 520px;
+      margin: 0 auto;
+      background: var(--bg-base);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-pill);
+      padding: 0.3rem 1rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .browser-body {
+      padding: 1.75rem;
+      background: var(--bg-surface);
+      position: relative;
+    }
+
+    .mock-problem-headline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .mock-editor-area {
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      font-size: 0.85rem;
+      position: relative;
+    }
+
+    .editor-row {
+      display: flex;
+      line-height: 1.7;
+    }
+    .ed-num {
+      width: 32px;
+      color: var(--text-dim);
+      user-select: none;
+      flex-shrink: 0;
+      font-size: 0.78rem;
+    }
+    .ed-code {
+      flex: 1;
+      white-space: pre;
+    }
+
+    /* Floating Push Button on Mockup */
+    .floating-mock-push {
+      position: absolute;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--accent-neon);
+      color: #080a0f;
+      padding: 0.75rem 1.4rem;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 25px var(--accent-neon-glow);
+      border: none;
+      cursor: pointer;
+      z-index: 20;
+      transition: all var(--transition-smooth);
+    }
+    .floating-mock-push:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 35px rgba(226, 253, 82, 0.5);
+    }
+
+    /* Mock Commit Card */
+    .mock-commit-notification {
+      margin-top: 1.25rem;
+      background: var(--bg-surface-elevated);
+      border: 1px solid rgba(226, 253, 82, 0.4);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.85rem;
+      transition: all var(--transition-smooth);
+    }
+    .mock-check-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-neon);
+      color: #080a0f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       Marquee / Infinite Scrolling Ticker (Wingly style)
+       ========================================================================== */
+    .ticker-section {
+      padding: 2.5rem 0;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.015);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      animation: tickerLoop 24s linear infinite;
+    }
+
+    .ticker-content {
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+      padding-right: 3rem;
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .ticker-sparkle {
+      color: var(--accent-neon);
+      font-size: 1.25rem;
+    }
+
+    @keyframes tickerLoop {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ==========================================================================
+       3. Supported Platforms — 3 Elevated Wingly Cards
+       ========================================================================== */
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 900px) {
+      .platforms-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .platform-card {
+      background: var(--card-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 2.25rem;
+      transition: all var(--transition-smooth);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .platform-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-5px);
+      box-shadow: var(--card-shadow), 0 0 30px var(--accent-neon-glow);
+    }
+
+    .platform-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-pill);
+      margin-bottom: 1.5rem;
+      width: fit-content;
+    }
+
+    .platform-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .platform-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      margin-bottom: 1.75rem;
+      flex: 1;
+    }
+
+    .platform-folder-target {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.85rem;
+      font-size: 0.78rem;
+      color: var(--accent-cyan);
+    }
+
+    /* Badges for platforms (no copyrighted logos) */
+    .p-badge-gfg {
+      background: rgba(46, 160, 67, 0.15);
+      color: #3fb950;
+      border: 1px solid rgba(46, 160, 67, 0.4);
+    }
+    .p-badge-hr {
+      background: rgba(0, 240, 255, 0.12);
+      color: #00f0ff;
+      border: 1px solid rgba(0, 240, 255, 0.35);
+    }
+    .p-badge-cc {
+      background: rgba(255, 138, 61, 0.15);
+      color: #ff8a3d;
+      border: 1px solid rgba(255, 138, 61, 0.4);
+    }
+
+    /* ==========================================================================
+       4. Bento Grid Features (Halo Lab Signature Bento Layout)
+       ========================================================================== */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 960px) {
+      .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 640px) {
+      .bento-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .bento-card {
+      background: var(--card-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 2.25rem;
+      transition: all var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .bento-card:hover {
+      border-color: rgba(226, 253, 82, 0.4);
+      transform: translateY(-4px);
+      box-shadow: var(--card-shadow), 0 0 25px rgba(226, 253, 82, 0.15);
+    }
+
+    .bento-col-span-2 {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 640px) {
+      .bento-col-span-2 {
+        grid-column: span 1;
+      }
+    }
+
+    .bento-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-neon);
+      margin-bottom: 1.5rem;
+      font-size: 1.35rem;
+    }
+    [data-theme="light"] .bento-icon-box {
+      color: #0f131c;
+    }
+
+    .bento-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.65rem;
+      color: var(--text-main);
+    }
+
+    .bento-card p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ==========================================================================
+       5. Installation Stepper
+       ========================================================================== */
+    .stepper-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .step-card {
+      background: var(--card-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 2rem 2.25rem;
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 1.75rem;
+      transition: all var(--transition-smooth);
+      position: relative;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .step-card:hover {
+      border-color: rgba(226, 253, 82, 0.35);
+      transform: translateX(4px);
+    }
+
+    @media (max-width: 600px) {
+      .step-card {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+
+    .step-badge-number {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--bg-surface-elevated);
+      border: 2px solid var(--accent-neon);
+      color: var(--accent-neon);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.35rem;
+      box-shadow: 0 0 15px var(--accent-neon-glow);
+    }
+    [data-theme="light"] .step-badge-number {
+      color: #0f131c;
+      border-color: #0f131c;
+    }
+
+    .step-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .step-body h4 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .step-body p {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* Snippet Box with Copy Button */
+    .copy-snippet-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-pill);
+      padding: 0.55rem 0.85rem 0.55rem 1.25rem;
+      margin-top: 0.35rem;
+    }
+
+    .copy-pill-btn {
+      background: var(--accent-neon);
+      color: #080a0f;
+      border: none;
+      padding: 0.35rem 0.95rem;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all var(--transition-smooth);
+      flex-shrink: 0;
+    }
+    .copy-pill-btn:hover {
+      background: var(--accent-neon-hover);
+      transform: scale(1.04);
+    }
+    .copy-pill-btn.copied {
+      background: #00f0ff;
+      color: #080a0f;
+    }
+
+    /* UI Step Mockups */
+    .step-ui-preview {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .troubleshoot-banner {
+      margin-top: 3rem;
+      background: var(--card-glass);
+      border: 1px solid var(--accent-orange);
+      border-left: 5px solid var(--accent-orange);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      display: flex;
+      gap: 1.5rem;
+      backdrop-filter: blur(16px);
+    }
+
+    /* ==========================================================================
+       6. Connect GitHub Setup
+       ========================================================================== */
+    .setup-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    @media (max-width: 960px) {
+      .setup-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .setup-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .setup-card-row {
+      background: var(--card-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      display: flex;
+      gap: 1.25rem;
+      backdrop-filter: blur(14px);
+    }
+
+    .setup-idx-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-neon-subtle);
+      border: 1px solid var(--accent-neon);
+      color: var(--accent-neon);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    [data-theme="light"] .setup-idx-circle {
+      color: #0f131c;
+      border-color: #0f131c;
+    }
+
+    /* Glass Side Panel Mockup */
+    .sidepanel-glass-card {
+      background: var(--card-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--card-shadow), 0 0 30px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(20px);
+    }
+
+    .sidepanel-top {
+      background: var(--bg-surface-elevated);
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidepanel-body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ==========================================================================
+       7. How to Use & Repo Structure
+       ========================================================================== */
+    .workflow-cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+      margin-bottom: 4rem;
+    }
+
+    @media (max-width: 900px) {
+      .workflow-cards-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .workflow-step-card {
+      background: var(--card-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 2.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      backdrop-filter: blur(16px);
+      transition: all var(--transition-smooth);
+    }
+    .workflow-step-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-4px);
+    }
+
+    .workflow-step-num {
+      font-family: var(--font-display);
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--accent-neon);
+      line-height: 1;
+    }
+    [data-theme="light"] .workflow-step-num {
+      color: #0284c7;
+    }
+
+    .workflow-step-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .workflow-step-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Terminal Repo Structure */
+    .terminal-glass-box {
+      background: var(--card-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(20px);
+    }
+
+    .terminal-header {
+      background: var(--bg-surface-elevated);
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .terminal-code-body {
+      background: var(--code-bg);
+      padding: 1.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.925rem;
+      line-height: 1.9;
+      overflow-x: auto;
+    }
+
+    /* ==========================================================================
+       8. Settings Explained
+       ========================================================================== */
+    .settings-bento {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 768px) {
+      .settings-bento {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .setting-item-card {
+      background: var(--card-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 2.25rem;
+      backdrop-filter: blur(16px);
+      transition: all var(--transition-smooth);
+    }
+    .setting-item-card:hover {
+      border-color: rgba(226, 253, 82, 0.35);
+      transform: translateY(-3px);
+    }
+
+    /* ==========================================================================
+       9. FAQ Accordion (Wingly Pill Accordion)
+       ========================================================================== */
+    .faq-container {
+      max-width: 880px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .faq-accordion-item {
+      background: var(--card-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all var(--transition-smooth);
+      backdrop-filter: blur(14px);
+    }
+    .faq-accordion-item:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .faq-accordion-item[open] {
+      border-color: var(--accent-neon);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .faq-header {
+      padding: 1.35rem 1.75rem;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      list-style: none;
+    }
+    .faq-header::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-circle-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: all var(--transition-smooth);
+      flex-shrink: 0;
+    }
+    .faq-accordion-item[open] .faq-circle-icon {
+      background: var(--accent-neon);
+      color: #080a0f;
+      transform: rotate(45deg);
+    }
+
+    .faq-content {
+      padding: 0 1.75rem 1.5rem;
+      font-size: 0.96rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 1.25rem;
+    }
+
+    /* ==========================================================================
+       10. Footer — Watermark Branding & Attributions
+       ========================================================================== */
+    .site-footer {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      padding: 5rem 0 3rem;
+      position: relative;
+      overflow: hidden;
+      margin-top: 5rem;
+    }
+
+    /* Giant Background Watermark */
+    .footer-watermark {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-display);
+      font-size: 12vw;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      color: rgba(255, 255, 255, 0.02);
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+    }
+    [data-theme="light"] .footer-watermark {
+      color: rgba(0, 0, 0, 0.02);
+    }
+
+    .footer-main-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 3rem;
+      flex-wrap: wrap;
+      margin-bottom: 4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-brand-box {
+      max-width: 400px;
+    }
+
+    .footer-brand-box p {
+      margin-top: 1rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+
+    .footer-links-grid {
+      display: flex;
+      gap: 4rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-link-group h5 {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-main);
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-links-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .footer-links-list a:hover {
+      color: var(--accent-neon);
+    }
+
+    .footer-bottom-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Video Modal */
+    .video-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .video-modal.open {
+      display: flex;
+    }
+    .video-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(4, 6, 10, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .video-modal-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 960px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(226, 253, 82, 0.2);
+    }
+    .video-modal-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-surface-elevated);
+    }
+    .video-modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      transition: all var(--transition-smooth);
+    }
+    .video-modal-close:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
+    }
+    .video-wrapper {
+      padding: 1rem;
+      background: #000;
+    }
+
+    /* Toast Notification for Clipboard Copy */
+    .toast-pill {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--accent-neon);
+      border-radius: var(--radius-pill);
+      padding: 0.75rem 1.4rem;
+      font-family: var(--font-display);
+      font-size: 0.88rem;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--accent-neon-glow);
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      transform: translateY(100px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all var(--transition-smooth);
+      z-index: 9999;
+    }
+    .toast-pill.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glow Background -->
+  <div class="bg-mesh-glow" aria-hidden="true">
+    <div class="mesh-blob-1"></div>
+    <div class="mesh-blob-2"></div>
+    <div class="mesh-blob-3"></div>
+  </div>
+
+  <!-- Toast Notification element -->
+  <div id="toast" class="toast-pill" role="status" aria-live="polite">
+    <span style="color:var(--accent-neon);">✦</span>
+    <span id="toast-message">Copied to clipboard!</span>
+  </div>
+
+  <!-- Demo Video Modal -->
+  <div id="video-modal" class="video-modal" aria-hidden="true" role="dialog" aria-label="CodePush Demo Video">
+    <div class="video-modal-backdrop" id="video-modal-backdrop"></div>
+    <div class="video-modal-content">
+      <div class="video-modal-header">
+        <div style="display:flex; align-items:center; gap:0.5rem; font-family:var(--font-display); font-weight:700;">
+          <span style="color:var(--accent-neon);">✦</span>
+          <span>CodePush — Launch Demo Video (20s)</span>
+        </div>
+        <button id="close-video-btn" class="video-modal-close" aria-label="Close modal">✕</button>
+      </div>
+      <div class="video-wrapper">
+        <video id="demo-video-player" controls preload="metadata" poster="brag.jpg" style="width:100%; border-radius:12px; display:block;">
+          <source src="brag.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       1. Floating Pill Navbar
+       ========================================================================== -->
+  <header class="site-header">
+    <div class="container">
+      <div class="navbar-pill">
+        <a href="#" class="brand" aria-label="CodePush Home">
+          <span class="brand-wing-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 14l8-8 8 8"></path>
+              <path d="M7 17l5-5 5 5"></path>
+            </svg>
+          </span>
+          <span>CodePush</span>
+          <span class="brand-version-badge" id="version-badge">v1.1.0</span>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="nav-links" aria-label="Main Navigation">
+          <a href="#platforms" class="nav-link">Platforms</a>
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#install" class="nav-link">Installation</a>
+          <a href="#setup" class="nav-link">GitHub Setup</a>
+          <a href="#workflow" class="nav-link">How it Works</a>
+          <a href="#faq" class="nav-link">FAQ</a>
+        </nav>
+
+        <!-- Right Side Nav Actions -->
+        <div class="nav-actions">
+          <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme" title="Toggle theme">
+            <!-- Moon Icon -->
+            <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <!-- Sun Icon -->
+            <svg class="theme-icon-sun" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+
+          <a href="codepush-extension.zip" class="btn btn-neon btn-sm desktop-download download-btn-target" download="codepush-extension.zip">
+            <span>Download</span>
+            <span class="btn-arrow-circle">↗</span>
+          </a>
+
+          <!-- Mobile Hamburger -->
+          <button id="hamburger-btn" class="hamburger-btn" aria-label="Toggle Navigation Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobile-menu" class="mobile-menu" aria-label="Mobile Navigation">
+      <a href="#platforms" class="nav-link mobile-link">Platforms</a>
+      <a href="#features" class="nav-link mobile-link">Features</a>
+      <a href="#install" class="nav-link mobile-link">Installation</a>
+      <a href="#setup" class="nav-link mobile-link">GitHub Setup</a>
+      <a href="#workflow" class="nav-link mobile-link">How it Works</a>
+      <a href="#settings" class="nav-link mobile-link">Settings</a>
+      <a href="#faq" class="nav-link mobile-link">FAQ</a>
+      <a href="codepush-extension.zip" class="btn btn-neon download-btn-target" style="margin-top: 1rem;" download="codepush-extension.zip">
+        <span>Download Extension (.zip)</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ==========================================================================
+         2. Hero Section — Wingly High-Impact Typography & Floating UI
+         ========================================================================== -->
+    <section class="hero-section">
+      <div class="container">
+        <!-- Live Sparkle Pill Tag -->
+        <div class="hero-sparkle-pill">
+          <span class="dot-live"></span>
+          <span>MANIFEST V3 • CHROME, BRAVE & EDGE READY</span>
+          <span style="color:var(--accent-neon);">✦</span>
+        </div>
+
+        <h1 class="hero-headline">
+          Push your solved problems to GitHub in <span class="text-gradient">one click</span>.
+        </h1>
+
+        <p class="hero-subtitle">
+          CodePush automatically detects your problem title, difficulty, language, and solution code on GeeksforGeeks, HackerRank, and CodeChef. Commit seamlessly with zero friction.
+        </p>
+
+        <div class="hero-actions">
+          <a href="codepush-extension.zip" class="btn btn-neon download-btn-target" download="codepush-extension.zip">
+            <span>Download Extension</span>
+            <span class="btn-arrow-circle">↗</span>
+          </a>
+          <button id="open-video-btn" class="btn btn-glass" aria-label="Watch demo video">
+            <span style="color:var(--accent-neon); font-size:1.1rem;">▶</span>
+            <span>Watch Demo (20s)</span>
+          </button>
+          <a href="#workflow" class="btn btn-glass">
+            <span>How it Works</span>
+          </a>
+        </div>
+
+        <!-- Overlapping Visual Mockup with Floating Cards -->
+        <div class="hero-visual-container">
+          <!-- Floating Status Pill 1 (Left) -->
+          <div class="floating-card-left">
+            <span style="font-size:1.1rem;">⚡</span>
+            <div>
+              <div style="font-size:0.8rem; font-weight:700;">Problem Solved</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">Two Sum • GeeksforGeeks</div>
+            </div>
+            <span style="background:var(--accent-neon-subtle); color:var(--accent-neon); padding:0.15rem 0.5rem; border-radius:9999px; font-size:0.7rem; font-weight:800;">AUTO</span>
+          </div>
+
+          <!-- Floating Status Pill 2 (Right) -->
+          <div class="floating-card-right">
+            <span style="color:var(--accent-neon); font-size:1.1rem;">✓</span>
+            <div>
+              <div style="font-size:0.8rem; font-weight:700;">Synced to GitHub</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">coding-solutions/GFG/two-sum.py</div>
+            </div>
+            <span class="mono" style="font-size:0.7rem; color:var(--accent-cyan);">#8f2c19a</span>
+          </div>
+
+          <!-- Browser Mockup -->
+          <div class="browser-glass-mock">
+            <div class="browser-top-bar">
+              <div class="browser-dots">
+                <span class="browser-dot b-dot-1"></span>
+                <span class="browser-dot b-dot-2"></span>
+                <span class="browser-dot b-dot-3"></span>
+              </div>
+              <div class="browser-pill-search">
+                <span class="mono">https://geeksforgeeks.org/problems/two-sum</span>
+                <span style="color:var(--accent-neon); font-size:0.75rem;">✦ CodePush Active</span>
+              </div>
+              <div style="width: 50px;"></div>
+            </div>
+
+            <div class="browser-body">
+              <div class="mock-problem-headline">
+                <div>
+                  <h3 style="font-family:var(--font-display); font-size:1.35rem; font-weight:800;">Two Sum Problem</h3>
+                  <div style="display:flex; gap:0.5rem; margin-top:0.35rem;">
+                    <span style="background:rgba(255,138,61,0.15); color:#ff8a3d; border:1px solid rgba(255,138,61,0.3); border-radius:9999px; padding:0.15rem 0.65rem; font-size:0.72rem; font-weight:700;">Medium</span>
+                    <span style="background:rgba(255,255,255,0.05); color:var(--text-muted); border-radius:9999px; padding:0.15rem 0.65rem; font-size:0.72rem;">Python 3</span>
+                    <span style="background:var(--accent-neon-subtle); color:var(--accent-neon); border-radius:9999px; padding:0.15rem 0.65rem; font-size:0.72rem; font-weight:700;">Accepted ✅</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Code Area -->
+              <div class="mock-editor-area mono">
+                <div class="editor-row"><span class="ed-num">1</span><span class="ed-code"><span style="color:#ff7b72;">class</span> <span style="color:#d2a8ff;">Solution</span>:</span></div>
+                <div class="editor-row"><span class="ed-num">2</span><span class="ed-code">    <span style="color:#ff7b72;">def</span> <span style="color:#d2a8ff;">twoSum</span>(self, nums: List[int], target: int) -> List[int]:</span></div>
+                <div class="editor-row"><span class="ed-num">3</span><span class="ed-code">        lookup = {} <span style="color:#8b949e;"># val -> index</span></span></div>
+                <div class="editor-row"><span class="ed-num">4</span><span class="ed-code">        <span style="color:#ff7b72;">for</span> i, n <span style="color:#ff7b72;">in</span> enumerate(nums):</span></div>
+                <div class="editor-row"><span class="ed-num">5</span><span class="ed-code">            diff = target - n</span></div>
+                <div class="editor-row"><span class="ed-num">6</span><span class="ed-code">            <span style="color:#ff7b72;">if</span> diff <span style="color:#ff7b72;">in</span> lookup:</span></div>
+                <div class="editor-row"><span class="ed-num">7</span><span class="ed-code">                <span style="color:#ff7b72;">return</span> [lookup[diff], i]</span></div>
+                <div class="editor-row"><span class="ed-num">8</span><span class="ed-code">            lookup[n] = i</span></div>
+              </div>
+
+              <!-- Injected Interactive Button -->
+              <button class="floating-mock-push" id="mock-push-btn" title="Click to test live commit animation!">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                  <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/>
+                </svg>
+                <span>Push to GitHub</span>
+              </button>
+
+              <!-- Commit Success Card -->
+              <div class="mock-commit-notification" id="mock-commit-card">
+                <div class="mock-check-icon">✓</div>
+                <div>
+                  <div style="font-weight:700;">Committed to GitHub! <span class="mono" style="color:var(--accent-cyan);" id="mock-hash">#8f2c19a</span></div>
+                  <div style="font-size:0.75rem; color:var(--text-muted);">coding-solutions/GeeksforGeeks/two-sum.py (just now)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+       Infinite Marquee Ticker (Wingly style)
+       ========================================================================== -->
+    <div class="ticker-section">
+      <div class="ticker-track">
+        <div class="ticker-content">
+          <span>GEEKSFORGEEKS</span> <span class="ticker-sparkle">✦</span>
+          <span>HACKERRANK</span> <span class="ticker-sparkle">✦</span>
+          <span>CODECHEF</span> <span class="ticker-sparkle">✦</span>
+          <span>100% PRIVATE</span> <span class="ticker-sparkle">✦</span>
+          <span>ZERO EXTERNAL SERVERS</span> <span class="ticker-sparkle">✦</span>
+          <span>MANIFEST V3</span> <span class="ticker-sparkle">✦</span>
+          <span>AUTOMATIC REPO CREATION</span> <span class="ticker-sparkle">✦</span>
+          <span>GIT HISTORY PRESERVED</span> <span class="ticker-sparkle">✦</span>
+        </div>
+        <div class="ticker-content">
+          <span>GEEKSFORGEEKS</span> <span class="ticker-sparkle">✦</span>
+          <span>HACKERRANK</span> <span class="ticker-sparkle">✦</span>
+          <span>CODECHEF</span> <span class="ticker-sparkle">✦</span>
+          <span>100% PRIVATE</span> <span class="ticker-sparkle">✦</span>
+          <span>ZERO EXTERNAL SERVERS</span> <span class="ticker-sparkle">✦</span>
+          <span>MANIFEST V3</span> <span class="ticker-sparkle">✦</span>
+          <span>AUTOMATIC REPO CREATION</span> <span class="ticker-sparkle">✦</span>
+          <span>GIT HISTORY PRESERVED</span> <span class="ticker-sparkle">✦</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+       3. Supported Platforms — 3 High-Impact Cards
+       ========================================================================== -->
+    <section class="section" id="platforms">
+      <div class="container">
+        <div class="section-header">
+          <div class="sparkle-tag">✦ Ecosystem Compatibility</div>
+          <h2 class="section-title">Works where you practice</h2>
+          <p class="section-description">
+            Engineered to inject smoothly into the coding interfaces of the three leading competitive programming platforms without conflicting with existing editors.
+          </p>
+        </div>
+
+        <div class="platforms-grid">
+          <!-- Platform 1 -->
+          <div class="platform-card">
+            <span class="platform-pill-badge p-badge-gfg">
+              <span>{GFG}</span> GeeksforGeeks
+            </span>
+            <h3>GeeksforGeeks Practice</h3>
+            <p>
+              Auto-detects problem name, difficulty tags (School to Hard), active coding language, and the editor's verified submission code. Full support for Problem of the Day (POTD).
+            </p>
+            <div class="platform-folder-target mono">
+              coding-solutions/GeeksforGeeks/&lt;slug&gt;.&lt;ext&gt;
+            </div>
+          </div>
+
+          <!-- Platform 2 -->
+          <div class="platform-card">
+            <span class="platform-pill-badge p-badge-hr">
+              <span>[HR]</span> HackerRank
+            </span>
+            <h3>HackerRank Challenges</h3>
+            <p>
+              Hooks into the challenge view across HackerRank tracks. Automatically pulls the challenge ID and your completed solution across Python, C++, Java, and algorithms.
+            </p>
+            <div class="platform-folder-target mono">
+              coding-solutions/HackerRank/&lt;slug&gt;.&lt;ext&gt;
+            </div>
+          </div>
+
+          <!-- Platform 3 -->
+          <div class="platform-card">
+            <span class="platform-pill-badge p-badge-cc">
+              <span>/*CC*/</span> CodeChef
+            </span>
+            <h3>CodeChef Practice</h3>
+            <p>
+              Detects practice tasks and division problems, extracting your accepted submission code and target language using clean problem code slugs.
+            </p>
+            <div class="platform-folder-target mono">
+              coding-solutions/CodeChef/&lt;slug&gt;.&lt;ext&gt;
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+       4. Bento Grid Features (Halo Lab Signature Bento Layout)
+       ========================================================================== -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-header">
+          <div class="sparkle-tag">✦ Core Architecture</div>
+          <h2 class="section-title">Built for developer velocity</h2>
+          <p class="section-description">
+            Focus entirely on problem solving while CodePush manages your GitHub commits, folder structures, and repository state in the background.
+          </p>
+        </div>
+
+        <div class="bento-grid">
+          <!-- Card 1 (Span 2) -->
+          <div class="bento-card bento-col-span-2">
+            <div class="bento-icon-box">⚡</div>
+            <h3>Smart Platform & Solution Auto-Detection</h3>
+            <p>
+              As soon as you land on any problem page, CodePush inspects the DOM to extract the problem title, normalized slug, difficulty level, and current programming language without any manual typing required.
+            </p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bento-card">
+            <div class="bento-icon-box">🚀</div>
+            <h3>One-Click Push</h3>
+            <p>
+              A floating button injected directly into the problem solver UI. Or open the side panel to edit and push in under a second.
+            </p>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bento-card">
+            <div class="bento-icon-box">📦</div>
+            <h3>Auto-Create Repository</h3>
+            <p>
+              First time using CodePush? It will automatically initialize a new repository (defaulting to <code>coding-solutions</code>) on your GitHub account via the GitHub API.
+            </p>
+          </div>
+
+          <!-- Card 4 (Span 2) -->
+          <div class="bento-card bento-col-span-2">
+            <div class="bento-icon-box">📁</div>
+            <h3>Clean Hierarchical Folders by Platform</h3>
+            <p>
+              Your solutions are kept impeccably organized: <code>&lt;repoName&gt;/&lt;Platform&gt;/&lt;problem-slug&gt;.&lt;ext&gt;</code>. Never worry about conflicting file names or messy single-directory dumps.
+            </p>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="bento-card">
+            <div class="bento-icon-box">🔁</div>
+            <h3>Git History Preserved</h3>
+            <p>
+              Optimized your algorithm? Re-pushing an existing problem updates the file in place with a new commit SHA, preserving your complete revision history.
+            </p>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="bento-card">
+            <div class="bento-icon-box">🔒</div>
+            <h3>Token Stays 100% Local</h3>
+            <p>
+              Zero external servers or telemetry. Your GitHub token is stored strictly in your browser's encrypted <code>chrome.storage.local</code> and only sent to <code>api.github.com</code>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+       5. Installation Stepper
+       ========================================================================== -->
+    <section class="section" id="install">
+      <div class="container">
+        <div class="section-header">
+          <div class="sparkle-tag">✦ 60-Second Setup</div>
+          <h2 class="section-title">Install CodePush in 5 steps</h2>
+          <p class="section-description">
+            Because CodePush gives you complete local control and transparency, install it in Chrome or any Chromium browser in less than a minute.
+          </p>
+        </div>
+
+        <div class="stepper-timeline">
+          <!-- Step 1 -->
+          <div class="step-card">
+            <div class="step-badge-number">1</div>
+            <div class="step-body">
+              <h4>Download and Unzip the Extension</h4>
+              <p>
+                Download the <code>codepush-extension.zip</code> file and unzip it into a folder on your computer. <strong>Important:</strong> Keep this folder permanently on your disk — do not delete it after loading.
+              </p>
+              <div style="margin-top:0.4rem;">
+                <a href="codepush-extension.zip" class="btn btn-neon btn-sm download-btn-target" download="codepush-extension.zip">
+                  <span>Download codepush-extension.zip</span>
+                  <span class="btn-arrow-circle">↓</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step-card">
+            <div class="step-badge-number">2</div>
+            <div class="step-body">
+              <h4>Open chrome://extensions in Chrome</h4>
+              <p>
+                Type or paste the internal Chrome extensions address into your address bar and press Enter.
+              </p>
+              <div class="copy-snippet-bar">
+                <code class="mono" id="chrome-url-text" style="color:var(--accent-cyan);">chrome://extensions</code>
+                <button class="copy-pill-btn" data-clipboard-target="#chrome-url-text">Copy URL</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="step-card">
+            <div class="step-badge-number">3</div>
+            <div class="step-body">
+              <h4>Turn on "Developer mode"</h4>
+              <p>
+                In the top-right corner of the Extensions dashboard, switch the <strong>Developer mode</strong> toggle to <strong>ON</strong>.
+              </p>
+              <div class="step-ui-preview">
+                <span style="font-weight:700; color:var(--text-main);">Developer mode</span>
+                <span style="background:var(--accent-neon); color:#080a0f; padding:0.2rem 0.65rem; border-radius:9999px; font-weight:800; font-size:0.75rem;">ON</span>
+                <span>(Located in top-right corner of Chrome)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="step-card">
+            <div class="step-badge-number">4</div>
+            <div class="step-body">
+              <h4>Click "Load unpacked"</h4>
+              <p>
+                Click the <strong>Load unpacked</strong> button in the top toolbar and select the unzipped folder containing <code>manifest.json</code>.
+              </p>
+              <div class="step-ui-preview">
+                <span style="background:rgba(255,255,255,0.08); border:1px solid var(--border-color); padding:0.35rem 0.85rem; border-radius:var(--radius-sm); color:var(--text-main); font-weight:700;">
+                  📁 Load unpacked
+                </span>
+                <span>Select the root unzipped folder that directly contains <code>manifest.json</code>.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="step-card">
+            <div class="step-badge-number">5</div>
+            <div class="step-body">
+              <h4>Pin CodePush to Toolbar</h4>
+              <p>
+                Click the puzzle-piece icon in your browser toolbar, find <strong>CodePush</strong>, and click the pin icon to keep the extension accessible.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Troubleshooting Note -->
+        <div class="troubleshoot-banner">
+          <div style="font-size:2rem; color:var(--accent-orange);">⚠️</div>
+          <div>
+            <h4 style="font-family:var(--font-display); font-size:1.15rem; font-weight:800; margin-bottom:0.4rem;">Troubleshooting: "Manifest file is missing or unreadable"</h4>
+            <p style="font-size:0.925rem; color:var(--text-muted); line-height:1.6;">
+              If Chrome displays this error, you selected the outer wrapper folder instead of the folder directly containing <code>manifest.json</code>. Make sure the folder you select has <code>manifest.json</code> directly inside it (e.g. <code>codepush-extension/manifest.json</code>).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+       6. Connect GitHub Setup
+       ========================================================================== -->
+    <section class="section" id="setup">
+      <div class="container">
+        <div class="section-header">
+          <div class="sparkle-tag">✦ GitHub Token</div>
+          <h2 class="section-title">Connect your GitHub account</h2>
+          <p class="section-description">
+            Generate a Personal Access Token in seconds. CodePush only requires repo access to create and commit your solution files.
+          </p>
+        </div>
+
+        <div class="setup-grid">
+          <div class="setup-cards-list">
+            <!-- Step A -->
+            <div class="setup-card-row">
+              <div class="setup-idx-circle">1</div>
+              <div>
+                <h4 style="font-family:var(--font-display); font-size:1.15rem; font-weight:700; margin-bottom:0.35rem;">Generate Token on GitHub</h4>
+                <p style="font-size:0.92rem; color:var(--text-muted); line-height:1.6;">
+                  Use our direct pre-configured link to open GitHub's token generator with the required description and repo scope pre-filled.
+                </p>
+                <div style="margin-top:0.75rem;">
+                  <a href="https://github.com/settings/tokens/new?scopes=repo&description=CodePush" target="_blank" rel="noopener noreferrer" class="btn btn-glass btn-sm" id="token-generator-link">
+                    <span>Open GitHub Token Generator ↗</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step B -->
+            <div class="setup-card-row">
+              <div class="setup-idx-circle">2</div>
+              <div>
+                <h4 style="font-family:var(--font-display); font-size:1.15rem; font-weight:700; margin-bottom:0.35rem;">Tick "repo" Scope & Copy</h4>
+                <p style="font-size:0.92rem; color:var(--text-muted); line-height:1.6;">
+                  Ensure the <strong>repo</strong> checkbox is checked. Set an expiry, click <strong>Generate token</strong>, and copy the token string (starts with <code>ghp_</code> or <code>github_pat_</code>).
+                </p>
+              </div>
+            </div>
+
+            <!-- Step C -->
+            <div class="setup-card-row">
+              <div class="setup-idx-circle">3</div>
+              <div>
+                <h4 style="font-family:var(--font-display); font-size:1.15rem; font-weight:700; margin-bottom:0.35rem;">Paste & Connect in CodePush</h4>
+                <p style="font-size:0.92rem; color:var(--text-muted); line-height:1.6;">
+                  Click the CodePush icon in your toolbar, paste the token, and press <strong>Connect GitHub</strong>. A green dot and <code>Connected as &lt;username&gt; ✅</code> confirms success!
+                </p>
+              </div>
+            </div>
+
+            <div style="background:var(--card-glass); border:1px solid var(--border-color); border-radius:var(--radius-lg); padding:1.25rem 1.5rem; font-size:0.88rem; color:var(--text-muted); display:flex; gap:0.75rem; align-items:flex-start;">
+              <span style="color:var(--accent-cyan); font-size:1.25rem;">🔒</span>
+              <div>
+                <strong>Security Guarantee:</strong> Never share your token. CodePush stores your token only in your browser's encrypted local storage (<code>chrome.storage.local</code>). It is only sent to <code>api.github.com</code>. You can revoke it anytime at GitHub Settings.
+              </div>
+            </div>
+          </div>
+
+          <!-- Glass Sidepanel Mockup -->
+          <div class="sidepanel-glass-card">
+            <div class="sidepanel-top">
+              <div style="display:flex; align-items:center; gap:0.65rem; font-family:var(--font-display); font-weight:800;">
+                <span class="brand-wing-icon" style="width:24px; height:24px; font-size:0.7rem;">✦</span>
+                <span>CodePush Side Panel</span>
+              </div>
+              <span class="brand-version-badge">v1.1.0</span>
+            </div>
+
+            <div class="sidepanel-body">
+              <div>
+                <label style="font-size:0.8rem; color:var(--text-muted); font-weight:700; display:block; margin-bottom:0.4rem;">GitHub Personal Access Token</label>
+                <div class="copy-snippet-bar" style="margin-top:0;">
+                  <span class="mono" style="font-size:0.825rem; color:var(--text-muted);">ghp_8bK32xM9••••••••••••</span>
+                  <span style="color:var(--accent-neon); font-size:0.75rem; font-weight:700;">Valid ✓</span>
+                </div>
+              </div>
+
+              <div>
+                <button class="btn btn-neon" style="width:100%; pointer-events:none;">
+                  <span>Connect GitHub</span>
+                </button>
+              </div>
+
+              <div style="background:var(--bg-surface-elevated); padding:1rem; border-radius:var(--radius-md); border:1px solid var(--border-color);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                  <span style="font-size:0.8rem; color:var(--text-muted);">Connection Status</span>
+                  <span style="background:var(--accent-neon-subtle); color:var(--accent-neon); border-radius:9999px; padding:0.2rem 0.65rem; font-size:0.75rem; font-weight:800;">
+                    Connected as @rajendra-18git ✅
+                  </span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted);">
+                  <span>Target Repository:</span>
+                  <span class="mono" style="color:var(--accent-cyan);">coding-solutions</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+       7. How to Use & Repo Structure
+       ========================================================================== -->
+    <section class="section" id="workflow">
+      <div class="container">
+        <div class="section-header">
+          <div class="sparkle-tag">✦ Effortless Workflow</div>
+          <h2 class="section-title">How to use CodePush</h2>
+          <p class="section-description">
+            Your solved coding problems automatically organized and committed with a single click.
+          </p>
+        </div>
+
+        <!-- 3 Workflow Steps -->
+        <div class="workflow-cards-row">
+          <div class="workflow-step-card">
+            <div class="workflow-step-num">01</div>
+            <h3>Solve on Any Platform</h3>
+            <p>
+              Open any problem on GeeksforGeeks, HackerRank, or CodeChef. Solve the problem in your favorite programming language and submit until accepted.
+            </p>
+          </div>
+
+          <div class="workflow-step-card">
+            <div class="workflow-step-num">02</div>
+            <h3>Click "Push to GitHub"</h3>
+            <p>
+              Click the floating button injected on the problem page, or open the side panel (title, difficulty, language, and code are auto-filled and editable).
+            </p>
+          </div>
+
+          <div class="workflow-step-card">
+            <div class="workflow-step-num">03</div>
+            <h3>Direct Commit Link</h3>
+            <p>
+              Press "Push to GitHub" and you'll immediately receive a direct link to the commit on your GitHub repository.
+            </p>
+          </div>
+        </div>
+
+        <!-- Terminal File Tree -->
+        <div class="terminal-glass-box">
+          <div class="terminal-header">
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <span style="color:var(--accent-neon); font-size:1.2rem;">📦</span>
+              <h4 style="font-family:var(--font-display); font-size:1.15rem; font-weight:800;">Target Repository Architecture</h4>
+            </div>
+
+            <button class="copy-pill-btn" id="copy-tree-btn">Copy Tree Structure</button>
+          </div>
+
+          <div class="terminal-code-body mono" id="tree-text-content">
+coding-solutions/
+├── GeeksforGeeks/
+│   └── two-sum.py
+├── HackerRank/
+│   └── solve-me-first.cpp
+└── CodeChef/
+    └── test-problem.java
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+       8. Settings Explained
+       ========================================================================== -->
+    <section class="section" id="settings">
+      <div class="container">
+        <div class="section-header">
+          <div class="sparkle-tag">✦ Configuration</div>
+          <h2 class="section-title">Settings & Permissions Explained</h2>
+          <p class="section-description">
+            Customize repository destination, privacy settings, and inspect all permissions CodePush requires.
+          </p>
+        </div>
+
+        <div class="settings-bento">
+          <div class="setting-item-card">
+            <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+              <span style="font-size:1.5rem;">📁</span>
+              <h3 style="font-family:var(--font-display); font-size:1.35rem; font-weight:800;">Repository Name</h3>
+            </div>
+            <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.65;">
+              By default, CodePush creates and pushes to a repository named <code>coding-solutions</code>. You can customize this in the side panel to any repo of your choice (e.g. <code>competitive-programming</code>).
+            </p>
+          </div>
+
+          <div class="setting-item-card">
+            <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+              <span style="font-size:1.5rem;">🛡️</span>
+              <h3 style="font-family:var(--font-display); font-size:1.35rem; font-weight:800;">Private Repository Toggle</h3>
+            </div>
+            <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.65;">
+              Keep your solutions private or make them public to showcase on your profile. You can toggle private repository mode anytime directly from the side panel.
+            </p>
+          </div>
+
+          <div class="setting-item-card" style="grid-column: 1 / -1;">
+            <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+              <span style="font-size:1.5rem;">🔐</span>
+              <h3 style="font-family:var(--font-display); font-size:1.35rem; font-weight:800;">Permissions Audit</h3>
+            </div>
+            <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.65; margin-bottom:1rem;">
+              CodePush requests only the absolute minimum permissions needed to operate securely:
+            </p>
+            <div style="display:flex; flex-wrap:wrap; gap:0.65rem;">
+              <span class="mono" style="background:var(--bg-surface-elevated); padding:0.35rem 0.75rem; border-radius:var(--radius-pill); font-size:0.78rem; border:1px solid var(--border-color); color:var(--accent-cyan);">storage</span>
+              <span class="mono" style="background:var(--bg-surface-elevated); padding:0.35rem 0.75rem; border-radius:var(--radius-pill); font-size:0.78rem; border:1px solid var(--border-color); color:var(--accent-cyan);">activeTab</span>
+              <span class="mono" style="background:var(--bg-surface-elevated); padding:0.35rem 0.75rem; border-radius:var(--radius-pill); font-size:0.78rem; border:1px solid var(--border-color); color:var(--accent-cyan);">sidePanel</span>
+              <span class="mono" style="background:var(--bg-surface-elevated); padding:0.35rem 0.75rem; border-radius:var(--radius-pill); font-size:0.78rem; border:1px solid var(--border-color); color:var(--accent-cyan);">api.github.com</span>
+              <span class="mono" style="background:var(--bg-surface-elevated); padding:0.35rem 0.75rem; border-radius:var(--radius-pill); font-size:0.78rem; border:1px solid var(--border-color); color:var(--accent-cyan);">*://*.geeksforgeeks.org/*</span>
+              <span class="mono" style="background:var(--bg-surface-elevated); padding:0.35rem 0.75rem; border-radius:var(--radius-pill); font-size:0.78rem; border:1px solid var(--border-color); color:var(--accent-cyan);">*://*.hackerrank.com/*</span>
+              <span class="mono" style="background:var(--bg-surface-elevated); padding:0.35rem 0.75rem; border-radius:var(--radius-pill); font-size:0.78rem; border:1px solid var(--border-color); color:var(--accent-cyan);">*://*.codechef.com/*</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+       9. FAQ Accordion (Wingly Pill Accordion)
+       ========================================================================== -->
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="section-header">
+          <div class="sparkle-tag">✦ Questions & Answers</div>
+          <h2 class="section-title">Frequently asked questions</h2>
+          <p class="section-description">
+            Everything you need to know about CodePush privacy, compatibility, and workflow.
+          </p>
+        </div>
+
+        <div class="faq-container">
+          <!-- FAQ 1 -->
+          <details class="faq-accordion-item">
+            <summary class="faq-header">
+              <span>Is CodePush completely free to use?</span>
+              <span class="faq-circle-icon">+</span>
+            </summary>
+            <div class="faq-content">
+              Yes, 100% free with no paywalls, subscriptions, or hidden limits. You can push as many solutions as you wish directly into your own GitHub repository.
+            </div>
+          </details>
+
+          <!-- FAQ 2 -->
+          <details class="faq-accordion-item">
+            <summary class="faq-header">
+              <span>Is my GitHub Personal Access Token safe?</span>
+              <span class="faq-circle-icon">+</span>
+            </summary>
+            <div class="faq-content">
+              Absolutely. CodePush has no backend servers or database. Your token is stored solely inside your browser's private <code>chrome.storage.local</code> sandboxed storage. The token is transmitted strictly to <code>api.github.com</code> via secure HTTPS. You retain full control and can revoke it anytime.
+            </div>
+          </details>
+
+          <!-- FAQ 3 -->
+          <details class="faq-accordion-item">
+            <summary class="faq-header">
+              <span>Which programming languages are supported?</span>
+              <span class="faq-circle-icon">+</span>
+            </summary>
+            <div class="faq-content">
+              All languages supported by GeeksforGeeks, HackerRank, and CodeChef are supported. CodePush automatically maps the detected language to its standard file extension (e.g. <code>.py</code> for Python, <code>.cpp</code> for C++, <code>.java</code> for Java, <code>.js</code> for JavaScript, <code>.c</code> for C, <code>.go</code> for Go, <code>.rs</code> for Rust, etc.).
+            </div>
+          </details>
+
+          <!-- FAQ 4 -->
+          <details class="faq-accordion-item">
+            <summary class="faq-header">
+              <span>What if the target repository already exists?</span>
+              <span class="faq-circle-icon">+</span>
+            </summary>
+            <div class="faq-content">
+              CodePush detects that the repository already exists on your GitHub account and simply creates a new commit in the appropriate platform folder without overwriting unrelated files.
+            </div>
+          </details>
+
+          <!-- FAQ 5 -->
+          <details class="faq-accordion-item">
+            <summary class="faq-header">
+              <span>What happens if I push the same problem again?</span>
+              <span class="faq-circle-icon">+</span>
+            </summary>
+            <div class="faq-content">
+              Re-pushing updates the existing file with your new code by querying the existing Git blob SHA and pushing an update commit. This preserves your complete commit history without creating duplicate files.
+            </div>
+          </details>
+
+          <!-- FAQ 6 -->
+          <details class="faq-accordion-item">
+            <summary class="faq-header">
+              <span>Does it work on Brave, Edge, and other Chromium browsers?</span>
+              <span class="faq-circle-icon">+</span>
+            </summary>
+            <div class="faq-content">
+              Yes! Microsoft Edge, Brave, Opera, Arc, and Vivaldi all share the Chromium engine. Simply open <code>edge://extensions</code> or <code>brave://extensions</code>, turn on Developer Mode, and click "Load unpacked".
+            </div>
+          </details>
+
+          <!-- FAQ 7 -->
+          <details class="faq-accordion-item">
+            <summary class="faq-header">
+              <span>Why do I need to enable "Developer mode"?</span>
+              <span class="faq-circle-icon">+</span>
+            </summary>
+            <div class="faq-content">
+              "Developer mode" is the official Chromium feature that allows developers to load unpacked extensions directly from source files without going through the Chrome Web Store. It guarantees that the code running in your browser is 100% transparent and inspectable.
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       10. Footer — Watermark Branding & Attributions
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="footer-watermark">CODEPUSH</div>
+
+    <div class="container">
+      <div class="footer-main-row">
+        <div class="footer-brand-box">
+          <div class="brand">
+            <span class="brand-wing-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M4 14l8-8 8 8"></path>
+                <path d="M7 17l5-5 5 5"></path>
+              </svg>
+            </span>
+            <span>CodePush</span>
+            <span class="brand-version-badge">v1.1.0</span>
+          </div>
+          <p>
+            The seamless bridge between your competitive programming practice and your GitHub profile. Designed with performance, precision, and privacy in mind.
+          </p>
+        </div>
+
+        <div class="footer-links-grid">
+          <div class="footer-link-group">
+            <h5>Navigation</h5>
+            <div class="footer-links-list">
+              <a href="#platforms">Supported Platforms</a>
+              <a href="#features">Features</a>
+              <a href="#install">Installation</a>
+              <a href="#setup">GitHub Setup</a>
+              <a href="#workflow">How it Works</a>
+              <a href="#faq">FAQ</a>
+            </div>
+          </div>
+
+          <div class="footer-link-group">
+            <h5>Resources & Source</h5>
+            <div class="footer-links-list">
+              <a href="https://github.com/rajendra-18git" target="_blank" rel="noopener noreferrer" id="footer-github-link">
+                GitHub: @rajendra-18git
+              </a>
+              <a href="https://github.com/settings/tokens/new?scopes=repo&description=CodePush" target="_blank" rel="noopener noreferrer">
+                Generate Token ↗
+              </a>
+              <a href="codepush-extension.zip" class="download-btn-target" download="codepush-extension.zip">
+                Download ZIP (v1.1.0)
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <div>
+          Made with care by <strong>Rajendra Kandiboyina</strong> • Version 1.1.0 (Manifest V3)
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem; color:var(--accent-neon); font-weight:600;">
+          <span>✦</span>
+          <span>Privacy: your token never leaves your browser</span>
+        </div>
+        <a href="#" class="btn btn-glass btn-sm" style="border-radius:var(--radius-pill);" aria-label="Back to top">
+          <span>Back to Top ↑</span>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       Inline JavaScript
+       ========================================================================== -->
+  <script>
+    /* ========================================================================
+       CONFIG OBJECT: Edit all placeholder URLs and metadata here
+       ======================================================================== */
+    const CONFIG = {
+      downloadUrl: "codepush-extension.zip",
+      githubUrl: "https://github.com/rajendra-18git",
+      version: "1.1.0",
+      tokenGenUrl: "https://github.com/settings/tokens/new?scopes=repo&description=CodePush",
+      defaultRepoName: "coding-solutions",
+      authorName: "Rajendra Kandiboyina"
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Sync CONFIG to DOM elements
+      document.querySelectorAll(".download-btn-target").forEach(el => {
+        el.setAttribute("href", CONFIG.downloadUrl);
+      });
+
+      const tokenLink = document.getElementById("token-generator-link");
+      if (tokenLink) tokenLink.setAttribute("href", CONFIG.tokenGenUrl);
+
+      const footerGit = document.getElementById("footer-github-link");
+      if (footerGit) footerGit.setAttribute("href", CONFIG.githubUrl);
+
+      const versionBadge = document.getElementById("version-badge");
+      if (versionBadge) versionBadge.textContent = "v" + CONFIG.version;
+
+      // 2. Light / Dark Theme Toggle
+      const themeToggleBtn = document.getElementById("theme-toggle");
+      const moonIcon = document.querySelector(".theme-icon-moon");
+      const sunIcon = document.querySelector(".theme-icon-sun");
+      
+      const savedTheme = localStorage.getItem("codepush_theme") || 
+        (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+
+      function setTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("codepush_theme", theme);
+        if (theme === "light") {
+          moonIcon.style.display = "none";
+          sunIcon.style.display = "inline-block";
+        } else {
+          moonIcon.style.display = "inline-block";
+          sunIcon.style.display = "none";
+        }
+      }
+      setTheme(savedTheme);
+
+      themeToggleBtn.addEventListener("click", () => {
+        const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+        setTheme(currentTheme === "dark" ? "light" : "dark");
+      });
+
+      // 3. Mobile Hamburger Menu Toggle
+      const hamburgerBtn = document.getElementById("hamburger-btn");
+      const mobileMenu = document.getElementById("mobile-menu");
+      
+      if (hamburgerBtn && mobileMenu) {
+        hamburgerBtn.addEventListener("click", () => {
+          const isOpen = mobileMenu.classList.toggle("open");
+          hamburgerBtn.setAttribute("aria-expanded", isOpen);
+        });
+
+        document.querySelectorAll(".mobile-link").forEach(link => {
+          link.addEventListener("click", () => {
+            mobileMenu.classList.remove("open");
+            hamburgerBtn.setAttribute("aria-expanded", "false");
+          });
+        });
+      }
+
+      // 4. Toast notification helper
+      const toast = document.getElementById("toast");
+      const toastMsg = document.getElementById("toast-message");
+      let toastTimer = null;
+
+      function showToast(message) {
+        if (!toast) return;
+        toastMsg.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2800);
+      }
+
+      // Video Modal Controls
+      const openVideoBtn = document.getElementById("open-video-btn");
+      const closeVideoBtn = document.getElementById("close-video-btn");
+      const videoModal = document.getElementById("video-modal");
+      const videoBackdrop = document.getElementById("video-modal-backdrop");
+      const demoVideoPlayer = document.getElementById("demo-video-player");
+
+      if (openVideoBtn && videoModal && demoVideoPlayer) {
+        openVideoBtn.addEventListener("click", () => {
+          videoModal.classList.add("open");
+          demoVideoPlayer.currentTime = 0;
+          demoVideoPlayer.play().catch(() => {});
+        });
+
+        const closeModal = () => {
+          videoModal.classList.remove("open");
+          demoVideoPlayer.pause();
+        };
+
+        if (closeVideoBtn) closeVideoBtn.addEventListener("click", closeModal);
+        if (videoBackdrop) videoBackdrop.addEventListener("click", closeModal);
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && videoModal.classList.contains("open")) {
+            closeModal();
+          }
+        });
+      }
+
+      // 5. Universal Copy to Clipboard handler
+      document.querySelectorAll("[data-clipboard-target]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const targetSelector = btn.getAttribute("data-clipboard-target");
+          const targetElement = document.querySelector(targetSelector);
+          if (!targetElement) return;
+
+          const textToCopy = targetElement.textContent.trim();
+          try {
+            await navigator.clipboard.writeText(textToCopy);
+            const originalText = btn.textContent;
+            btn.classList.add("copied");
+            btn.textContent = "Copied! ✓";
+            showToast(`Copied "${textToCopy}" to clipboard!`);
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.classList.remove("copied");
+            }, 2000);
+          } catch (err) {
+            fallbackCopy(textToCopy);
+            showToast("Copied to clipboard!");
+          }
+        });
+      });
+
+      // Copy File Tree Button
+      const copyTreeBtn = document.getElementById("copy-tree-btn");
+      if (copyTreeBtn) {
+        copyTreeBtn.addEventListener("click", async () => {
+          const treeText = `coding-solutions/
+├── GeeksforGeeks/
+│   └── two-sum.py
+├── HackerRank/
+│   └── solve-me-first.cpp
+└── CodeChef/
+    └── test-problem.java`;
+          try {
+            await navigator.clipboard.writeText(treeText);
+            copyTreeBtn.textContent = "Tree Copied! ✓";
+            showToast("Repository tree copied to clipboard!");
+            setTimeout(() => {
+              copyTreeBtn.textContent = "Copy Tree Structure";
+            }, 2000);
+          } catch (e) {
+            fallbackCopy(treeText);
+            showToast("Repository tree copied!");
+          }
+        });
+      }
+
+      function fallbackCopy(text) {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      // 6. Interactive Hero Mock Push Button Demo
+      const mockPushBtn = document.getElementById("mock-push-btn");
+      const mockCommitCard = document.getElementById("mock-commit-card");
+      const mockHash = document.getElementById("mock-hash");
+      
+      if (mockPushBtn && mockCommitCard) {
+        mockPushBtn.addEventListener("click", () => {
+          mockPushBtn.style.transform = "scale(0.95)";
+          mockPushBtn.innerHTML = `<span>Pushing to GitHub...</span>`;
+          
+          setTimeout(() => {
+            const randomHex = Math.random().toString(16).substring(2, 9);
+            if (mockHash) mockHash.textContent = "#" + randomHex;
+            mockCommitCard.style.animation = "none";
+            void mockCommitCard.offsetWidth;
+            mockCommitCard.style.boxShadow = "0 0 25px var(--accent-neon-glow)";
+            
+            mockPushBtn.style.transform = "";
+            mockPushBtn.innerHTML = `<span>Pushed! (#${randomHex})</span>`;
+            showToast(`Simulated commit #${randomHex} pushed to coding-solutions!`);
+            
+            setTimeout(() => {
+              mockPushBtn.innerHTML = `
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                  <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/>
+                </svg>
+                <span>Push to GitHub</span>
+              `;
+            }, 3000);
+          }, 600);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

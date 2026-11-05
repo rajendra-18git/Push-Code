@@ -1,0 +1,8 @@
+# Dependencies & caches
+node_modules/
+.cache/
+
+# Brag intermediate & build outputs
+brag-output/
+*temp-brag*
+*brag-output*
