@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      width: 360px;
+      margin: 0;
+      padding: 14px;
+      background: #0d1117;
+      color: #e6edf3;
+      font: 13px/1.45 system-ui, sans-serif;
+    }
+    h1 { font-size: 16px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+    h1 .dot { width: 8px; height: 8px; border-radius: 50%; background: #30363d; display: inline-block; }
+    h1 .dot.on { background: #238636; }
+    h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: #7d8590; margin: 16px 0 8px; }
+    section { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    label { display: block; font-size: 11px; color: #7d8590; margin: 8px 0 4px; }
+    input[type="text"], input[type="password"], select, textarea {
+      width: 100%; padding: 7px 9px; border-radius: 7px; border: 1px solid #30363d;
+      background: #0d1117; color: #e6edf3; font: 12px/1.4 ui-monospace, monospace;
+    }
+    textarea { resize: vertical; min-height: 120px; }
+    button {
+      width: 100%; margin-top: 10px; padding: 8px 12px; border: none; border-radius: 7px;
+      background: #238636; color: #fff; font-weight: 600; font-size: 13px; cursor: pointer;
+    }
+    button:hover { background: #2ea043; }
+    button:disabled { opacity: .6; cursor: default; }
+    button.ghost { background: transparent; border: 1px solid #30363d; color: #e6edf3; }
+    .hint { font-size: 11px; color: #7d8590; margin: 8px 0 0; }
+    .hint a { color: #58a6ff; }
+    .error { color: #f85149; font-size: 11px; margin: 6px 0 0; min-height: 14px; }
+    #status { font-size: 11px; margin: 8px 0 0; min-height: 15px; color: #7d8590; }
+    #status.error { color: #f85149; }
+    #status a { color: #58a6ff; }
+    .check { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+    .check input { width: auto; }
+    #conn-in p { margin: 0; }
+  </style>
+</head>
+<body>
+  <h1>CodePush <span class="dot" id="conn-dot"></span></h1>
+
+  <section>
+    <div id="conn-out">
+      <p style="margin:0 0 4px">Connect your GitHub account to start pushing solutions.</p>
+      <label for="pat">Personal access token (repo scope)</label>
+      <input id="pat" type="password" placeholder="ghp_… or github_pat_…" />
+      <button id="connect-btn">Connect GitHub</button>
+      <p class="hint">
+        Create one at
+        <a href="https://github.com/settings/tokens/new?scopes=repo&description=CodePush" target="_blank" rel="noopener">github.com/settings/tokens</a>
+        — it stays in your browser and is only sent to api.github.com.
+      </p>
+      <p class="error" id="conn-error"></p>
+    </div>
+    <div id="conn-in" hidden>
+      <p>Connected as <b id="login"></b> ✅</p>
+      <button id="disconnect-btn" class="ghost">Disconnect</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Solution</h2>
+    <input id="url" type="hidden" />
+    <label for="platform">Platform</label>
+    <select id="platform"></select>
+    <label for="title">Problem title</label>
+    <input id="title" type="text" placeholder="Two Sum" />
+    <label for="language">Language</label>
+    <select id="language"></select>
+    <label for="code">Code</label>
+    <textarea id="code" placeholder="Paste or edit your solution here…"></textarea>
+    <button id="push-btn">Push to GitHub</button>
+    <p id="status"></p>
+    <p class="hint">On a supported problem page, the form is filled automatically — or just use the floating button on the page.</p>
+  </section>
+
+  <section>
+    <h2>Settings</h2>
+    <label for="repo">GitHub repository</label>
+    <input id="repo" type="text" placeholder="coding-solutions" />
+    <label class="check"><input id="private" type="checkbox" /> Create as private repository</label>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>
